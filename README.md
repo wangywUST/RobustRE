@@ -7,8 +7,9 @@ This repo includes the open-sourced code and data for our work *How Fragile is R
 
 ## Dataset
 
-[2023/05/29] We provide the test set of TACRED, TACREV, and Re-TACRED for the ease of evaluation.
+[2023/05/29] ENTRED is a challenging relation extraction dataset that we build by applying the type-constrained entity replacements on TACRED. You need not run the code from scratch to build the dataset ENTRED from beginning. We have provided the built ENTRED at `new_test.json`. We introduce all the .json files as following.
 
+1. `new_test.json`: The proposed benchmark: ENTRED.
 2. `test.json`: The test set of TACRED.
 3. `re_test.json`: The test set of Re-TACRED.
 4. `rev_test.json`: The test set of TACREV.
@@ -29,6 +30,14 @@ This step can be skipped because we have stored the outputs to `final_id_resampl
 
 ### Evaluation of LUKE under entity replacements
 >python entre.py
+
+## Evaluate LUKE on TACRED and ENTRED 
+
+### Evaluate LUKE on TACRED:
+>python luke.py --input_file test.json --output_file luke_pred.output
+
+### Evaluate LUKE on ENTRED:
+>python luke.py --input_file new_test.json --output_file new_luke_pred.output
 
 ## License
 
