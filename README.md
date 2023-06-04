@@ -1,5 +1,5 @@
-
 # How Fragile is Relation Extraction under Entity Replacements?
+[![arXiv](https://img.shields.io/badge/arXiv-2305.13551-b31b1b.svg)](https://arxiv.org/abs/2305.13551)
 
 ## Overview
 
