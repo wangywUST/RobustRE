@@ -9,7 +9,7 @@ Relation extraction models are fragile to our entity replacements (ENTRE)|
 :-------------------------:|
 ![](Fig/fig_5.svg)|
 
-## Dataset
+## A New Relation Extraction Dataset: ENTRED
 
 [2023/05/29] ENTRED is a challenging relation extraction dataset that we build by applying the type-constrained entity replacements on TACRED. You need not run the code from scratch to build the dataset ENTRED from beginning. We have provided the built ENTRED at `new_test.json`. We introduce all the .json files as following.
 
@@ -20,15 +20,15 @@ Relation extraction models are fragile to our entity replacements (ENTRE)|
 
 ## Run
 
-The running of the evaluation of TACRED with entity replacements.
+Evaluation of relation extraction with entity replacements.
 
 ### Collecting Person and Organization Names from Wikipedia (Optional)
 >get_wiki.ipynb
 
 This step can be skipped because we have stored the outputs to `wiki_organization.output` and `wiki_person.output`.
 
-### Data Analysis (Optional)
->eric.ipynb
+### Data Analysis of Existing Relation Extraction Datasets (Optional)
+>entre.ipynb
 
 This step can be skipped because we have stored the outputs to `final_id_resample_ls.output`.
 
