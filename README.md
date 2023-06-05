@@ -18,6 +18,11 @@ Relation extraction models are fragile to our entity replacements (ENTRE)|
 3. `re_test.json`: The test set of Re-TACRED.
 4. `rev_test.json`: The test set of TACREV.
 
+## Install Dependencies (Optional)
+```
+pip install -r requirements.txt
+```
+
 ## Evaluate LUKE on TACRED and ENTRED 
 
 ### Evaluate LUKE on TACRED:
@@ -30,12 +35,12 @@ python inference.py --input_file test.json --output_file luke_test.output --mode
 python inference.py --input_file test_entred.json --output_file luke_test_entred.output --model luke
 ```
 
-## Evaluation of LUKE under entity replacements
+## Evaluate LUKE under entity replacements
 ```
 python entre.py --input_file test.json --output_file output_luke_200.json --model luke --repeat_time 200
 ```
 
-## Collecting Person and Organization Names from Wikipedia (Optional)
+## Collect Person and Organization Names from Wikipedia (Optional)
 >get_wiki.ipynb
 
 This step can be skipped because we have stored the outputs to `wiki_organization.output` and `wiki_person.output`.
