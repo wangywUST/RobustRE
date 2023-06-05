@@ -30,7 +30,7 @@ python inference.py --input_file test.json --output_file luke_test.output --mode
 python inference.py --input_file test_entred.json --output_file luke_test_entred.output --model luke
 ```
 
-### Evaluation of LUKE under entity replacements
+## Evaluation of LUKE under entity replacements
 ```
 python entre.py --input_file test.json --output_file output_luke_200.json --model luke --repeat_time 200
 ```
