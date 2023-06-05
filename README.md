@@ -5,9 +5,9 @@
 
 This repo includes the source code and data for our work *How Fragile is Relation Extraction under Entity Replacements?*. In this work, we operate the random and type-constrained entity replacements over the RE instances in TACRED and evaluate the state-of-the-art RE models under the entity replacements. We observe the 30\% - 50\% F1 score drops on the state-of-the-art RE models under entity replacements.
 
-Relation extraction models are fragile to our entity replacements (ENTRE)|  
+We evaluate the RE models with the replaced entities and observe many wrong predictions after the entity replacements.|  
 :-------------------------:|
-![](Fig/fig_5.svg)|
+![](Fig/fig_17.png)|
 
 ## A New Relation Extraction Dataset: ENTRED
 
@@ -39,6 +39,10 @@ python inference.py --input_file test_entred.json --output_file luke_test_entred
 ```
 python entre.py --input_file test.json --output_file output_luke_200.json --model luke --repeat_time 200
 ```
+
+Relation extraction models are fragile to our entity replacements (ENTRE)|  
+:-------------------------:|
+![](Fig/fig_5.svg)|
 
 ## Collect Person and Organization Names from Wikipedia (Optional)
 >get_wiki.ipynb
