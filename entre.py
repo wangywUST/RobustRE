@@ -250,27 +250,18 @@ def replaceNameJson(input_file, output_file, subj_id_ls, obj_id_ls, subj_name_ls
     with open(output_file, "w") as f:
         json.dump(output_data, f)
         
-def onlyNameJson(input_file, output_file, subj_id_ls, obj_id_ls, subj_name_ls, obj_name_ls):
+def onlyNameJson(input_file, output_file):
     with open(input_file, "r") as f:
         input_data = json.load(f)
         
     org_subj_name_ls = [data_['token'][data_['subj_start'] : data_['subj_end'] + 1] for data_ in input_data]
     org_obj_name_ls = [data_['token'][data_['obj_start'] : data_['obj_end'] + 1] for data_ in input_data]
-    
-    new_subj_name_ls = org_subj_name_ls[:]
-    new_obj_name_ls = org_obj_name_ls[:]
-    
-    for i_ in range(len(subj_id_ls)):
-        new_subj_name_ls[subj_id_ls[i_]] = subj_name_ls[i_]
-    
-    for i_ in range(len(obj_id_ls)):
-        new_obj_name_ls[obj_id_ls[i_]] = obj_name_ls[i_]
         
     output_data = input_data[:]
     for id_ in range(len(output_data)):
-        output_data[id_]['token'] = new_subj_name_ls[id_] + new_obj_name_ls[id_]
-        output_data[id_]['subj_start'], output_data[id_]['subj_end'] = 0, len(new_subj_name_ls[id_]) - 1
-        output_data[id_]['obj_start'], output_data[id_]['obj_end'] = len(new_subj_name_ls[id_]), len(new_subj_name_ls[id_]) + len(new_obj_name_ls[id_]) - 1
+        output_data[id_]['token'] = org_subj_name_ls[id_] + org_obj_name_ls[id_]
+        output_data[id_]['subj_start'], output_data[id_]['subj_end'] = 0, len(org_subj_name_ls[id_]) - 1
+        output_data[id_]['obj_start'], output_data[id_]['obj_end'] = len(org_subj_name_ls[id_]), len(org_subj_name_ls[id_]) + len(org_obj_name_ls[id_]) - 1
 
     with open(output_file, "w") as f:
         json.dump(output_data, f)
@@ -364,7 +355,7 @@ def lukeInference(input_file, id_ls):
     wrong_id_ls = [i_ for i_ in range(len(keys)) if keys[i_] != luke_preds[i_] and keys[i_] != 0]
     wrong_example_ls = [test_examples[i_] for i_ in wrong_id_ls]
 
-    return keys, luke_preds
+    return keys, luke_preds, luke_prob, luke_id_to_label
 
 def ireInference(input_file, id_ls):
     config = AutoConfig.from_pretrained(
@@ -402,28 +393,46 @@ def ireInference(input_file, id_ls):
     keys = np.array(keys, dtype=np.int64)
     preds = np.array(preds, dtype=np.int64)
 
-    return keys, preds
+    return keys, preds, np.array(pred_prob), {value_ : key_ for key_, value_ in processor.LABEL_TO_ID.items()}
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--input_file", type=str)
+    parser.add_argument("--output_file", type=str)
+    parser.add_argument("--model", type=str)
+    parser.add_argument("--repeat_time", type=int)
     
+    args = parser.parse_args()
+    
+    subj_id_ls, obj_id_ls = joblib.load('to_replace_id_ls.output')
+    care_id_ls = sorted(list(set(subj_id_ls + obj_id_ls)))
+    replaceNameJson(args.input_file, args.output_file, [], [], [], [])
+    if args.model == 'luke':
+        key_array, pred_array, _, _ = lukeInference(args.input_file, list(range(15509)))
+    elif args.model == 'ire':
+        key_array, pred_array, _, _ = ireInference(args.input_file, list(range(15509)))
+    else:
+        assert 1 == 0
+    print('original f1 score ' , getF1Micro(key_array[care_id_ls], pred_array[care_id_ls]))
 
-_, subj_id_ls, obj_id_ls = joblib.load('final_id_resample_ls.output')
-care_id_ls = sorted(list(set(subj_id_ls + obj_id_ls)))
-replaceNameJson('test.json', 'output.json', [], [], [], [])
-onlyNameJson('test.json', 'output_only_name.json', [], [], [], [])
-key_array, pred_array = lukeInference('test.json', list(range(15509)))
-# key_array, pred_array = ireInference('test.json', list(range(15509)))
-print('original f1 score: ' , getF1Micro(key_array[care_id_ls], pred_array[care_id_ls]))
+    for replace_id_ in range(args.repeat_time):
+        print('replace time: ', replace_id_)
+        right_id_ls = [id_ for id_ in care_id_ls 
+                      if key_array[id_] == pred_array[id_]
+                       # and key_array[id_] != 0
+                     ]
+        subj_id_ls = [id_ for id_ in subj_id_ls if id_ in right_id_ls]
+        obj_id_ls = [id_ for id_ in obj_id_ls if id_ in right_id_ls]
+        subj_name_ls, obj_name_ls = sampleName(args.output_file, subj_id_ls, obj_id_ls)
+        replaceNameJson(args.output_file, args.output_file, subj_id_ls, obj_id_ls, subj_name_ls, obj_name_ls)
 
-for replace_id_ in range(10000):
-    print('replace time: ', replace_id_)
-    right_id_ls = [id_ for id_ in care_id_ls 
-                  if key_array[id_] == pred_array[id_]
-                   and key_array[id_] != 0
-                 ]
-    subj_id_ls = [id_ for id_ in subj_id_ls if id_ in right_id_ls]
-    obj_id_ls = [id_ for id_ in obj_id_ls if id_ in right_id_ls]
-    subj_name_ls, obj_name_ls = sampleName('output.json', subj_id_ls, obj_id_ls)
-    replaceNameJson('output.json', 'output.json', subj_id_ls, obj_id_ls, subj_name_ls, obj_name_ls)
-    right_key_array, right_pred_array = lukeInference('output.json', right_id_ls)
-    # right_key_array, right_pred_array = ireInference('output.json', right_id_ls)
-    key_array[right_id_ls], pred_array[right_id_ls] = right_key_array, right_pred_array
-    print('f1 score: ' , getF1Micro(key_array[care_id_ls], pred_array[care_id_ls]))
+        if args.model == 'luke':
+            right_key_array, right_pred_array, _, _ = lukeInference(args.output_file, right_id_ls)
+        elif args.model == 'ire':
+            right_key_array, right_pred_array, _, _ = ireInference(args.output_file, right_id_ls)
+        else:
+            assert 1 == 0
+
+        key_array[right_id_ls], pred_array[right_id_ls] = right_key_array, right_pred_array
+        print('f1 score ' , getF1Micro(key_array[care_id_ls], pred_array[care_id_ls]))
