@@ -3,7 +3,11 @@
 
 ## Overview
 
-This repo includes the open-sourced code and data for our work *How Fragile is Relation Extraction under Entity Replacements?*.
+This repo includes the open-sourced code and data for our work *How Fragile is Relation Extraction under Entity Replacements?*. In this work, we operate the random and type-constrained entity replacements over the RE instances in TACRED and evaluate the state-of-the-art RE models under the entity replacements. We observe the 30\% - 50\% F1 score drops on the state-of-the-art RE models under entity replacements.
+
+Relation extraction models are fragile to our entity replacements (ENTRE)|  
+:-------------------------:|
+![](Fig/fig_5.svg)|
 
 ## Dataset
 
